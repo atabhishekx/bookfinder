@@ -12,6 +12,18 @@ const axiosInstance = axios.create({
   }
 });
 
+// Dedicated client for subject queries. Open Library's subject API can be very
+// slow for large categories (e.g. "fiction"), so we allow a longer timeout and
+// retry a couple of times before giving up.
+const subjectClient = axios.create({
+  timeout: 20000,
+  headers: {
+    'User-Agent': 'BookFinder/1.0 (Academic Project)'
+  }
+});
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 async function searchBooks(query, page = 1, limit = 20) {
   const response = await axiosInstance.get(SEARCH_URL, {
     params: {
@@ -74,15 +86,26 @@ async function getTrendingBooks(limit = 10) {
 
 async function getBooksBySubject(subject, page = 1, limit = 20) {
   const offset = (page - 1) * limit;
-  const response = await axiosInstance.get(`${OPEN_LIBRARY_BASE}/subjects/${encodeURIComponent(subject.toLowerCase())}.json`, {
-    params: {
-      limit,
-      offset,
-      details: true
-    }
-  });
+  const url = `${OPEN_LIBRARY_BASE}/subjects/${encodeURIComponent(subject.toLowerCase())}.json`;
 
-  return normalizeSubjectResults(response.data, subject, page, limit);
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await subjectClient.get(url, {
+        params: { limit, offset }
+      });
+      return normalizeSubjectResults(response.data, subject, page, limit);
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) {
+        await sleep(1000 * attempt);
+      }
+    }
+  }
+
+  throw new Error(
+    `Could not load books for "${subject}". The book catalogue may be busy — please try again.`
+  );
 }
 
 const CATEGORY_DEFS = [
@@ -135,8 +158,8 @@ async function getCategories() {
 async function getRecommendations(limit = 10) {
   const [trendingRes, fictionRes, scienceRes] = await Promise.allSettled([
     axiosInstance.get(`${OPEN_LIBRARY_BASE}/trending/daily.json`, { params: { limit: Math.ceil(limit / 2) } }),
-    axiosInstance.get(`${OPEN_LIBRARY_BASE}/subjects/fiction.json`, { params: { limit: Math.ceil(limit / 3), details: true } }),
-    axiosInstance.get(`${OPEN_LIBRARY_BASE}/subjects/science.json`, { params: { limit: Math.ceil(limit / 3), details: true } }),
+    subjectClient.get(`${OPEN_LIBRARY_BASE}/subjects/fiction.json`, { params: { limit: Math.ceil(limit / 3) } }),
+    subjectClient.get(`${OPEN_LIBRARY_BASE}/subjects/science.json`, { params: { limit: Math.ceil(limit / 3) } }),
   ]);
 
   const seen = new Set();

@@ -52,7 +52,12 @@ router.get('/subject/:subject', async (req, res, next) => {
     const result = await bookService.getBooksBySubject(subject.trim(), pageNum, limitNum);
     res.json(result);
   } catch (error) {
-    next(error);
+    // Return a clean, user-friendly error instead of a raw 500 stack trace.
+    // The upstream (Open Library) subject API is often slow for large categories.
+    res.status(502).json({
+      error: 'Upstream error',
+      message: error.message || 'Could not load books for this category. Please try again.'
+    });
   }
 });
 

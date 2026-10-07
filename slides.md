@@ -1,257 +1,436 @@
 # BookFinder — Project Presentation
 
-> **Course:** Web & App Development (WAD) — ISE
-> **Project Title:** BookFinder — Mobile Book Discovery Application
-> **Group Members:**
-> | Roll No. | Name |
-> |----------|------|
-> | 52 | Abhishek Vishwakarma |
-> | 53 | Pranav Vishwakarma |
-> | 54 | Sanchita Warkad |
-> | 55 | Ankesh Yadav |
+> **Course:** Web & App Development (WAD) — ISE  
+> **Project:** BookFinder — Mobile Book Discovery Application  
+> **Team:** Abhishek Vishwakarma · Pranav Vishwakarma · Sanchita Warkad · Ankesh Yadav  
+> **Suggested duration:** 8–10 minutes
 
 ---
 
-## Slide 1 — Title Slide
+## Slide 1 — Title
 
-### **BookFinder**
-#### *Discover Your Next Favorite Book*
+# **BookFinder**
+### Discover your next favourite book
 
-- A cross-platform mobile book discovery application
-- Built with **Flutter** (frontend) + **Node.js / Express** (backend)
-- Powered by the **Open Library** open API
-- Live features: animated splash, category-wise distribution, recommendations, wishlist
+**A cross-platform mobile book discovery experience**
 
-**Group 52–55**
-- 52 · Abhishek Vishwakarma
-- 53 · Pranav Vishwakarma
-- 54 · Sanchita Warkad
-- 55 · Ankesh Yadav
+- Search millions of books
+- Explore categories and trending titles
+- Open rich book details
+- Save a personal wishlist
 
----
+**Built with Flutter + Node.js/Express + Open Library**
 
-## Slide 2 — Introduction & Overview
-
-### What is BookFinder?
-BookFinder is a book discovery app that lets users search, browse, and save books they love.
-Instead of a plain search box, the home screen is a rich dashboard:
-
-- **Animated splash screen** with the app logo on every launch
-- **Category-wise distribution** of books (16 categories with counts + percentage bars)
-- **Recommended for you** section (trending + popular picks)
-- **Your Wishlist** — books the user heart-saves, persisted locally
-- Full **book details** (description, ratings, editions, subjects)
-
-### Why it matters
-- Millions of books are hard to discover; a single search box is not enough.
-- Open Library provides free, legal access to a huge catalogue (20M+ works).
-- A custom backend keeps API keys/logic server-side and normalizes messy data.
+> **Presenter cue:** Open with the problem: “A catalogue can be huge, but discovering the right book should feel simple.”
 
 ---
 
-## Slide 3 — Problem Statement & Objectives
+## Slide 2 — The Problem
 
-### Problem
-- Readers struggle to find new books matching their interests.
-- Raw Open Library responses are inconsistent and hard to consume directly from a mobile app.
-- No personalized "home" experience — just a search field.
+### Finding a book should be easier than searching a database
 
-### Objectives
-1. Build a polished, animated mobile UI with a reusable brand logo (`logo.svg`).
-2. Create a REST backend that proxies & normalizes Open Library data.
-3. Show **category-wise distribution** ready on the home screen.
-4. Show **recommended** books and a persistent **wishlist**.
-5. Support deep book details (editions, ratings, subjects).
+Readers often face:
+
+- Too many titles and not enough useful discovery
+- Inconsistent metadata across books and editions
+- Search results without context or personalization
+- No simple way to save interesting books for later
+
+### Our opportunity
+
+Turn an open catalogue into a focused mobile experience:
+
+> **Discover → Explore → Read details → Save**
+
+---
+
+## Slide 3 — Our Solution
+
+### BookFinder is a discovery-first book app
+
+The home screen is a dashboard, not just a search box:
+
+1. **Animated splash** establishes the product identity.
+2. **Category distribution** shows what is available at a glance.
+3. **Recommendations** combine trending and popular subjects.
+4. **Book details** bring description, ratings, subjects, and editions together.
+5. **Wishlist** keeps saved books available across app restarts.
 
 ### Success criteria
-- App opens with a logo animation → home dashboard loads with categories, recommendations, and wishlist.
-- Search returns paginated results; tapping a book shows full details.
+
+- Search is fast, paginated, and easy to browse.
+- Important home data loads together.
+- A saved book remains saved after closing and reopening the app.
+- A single normalized model powers all screens.
 
 ---
 
-## Slide 4 — Technology Stack
+## Slide 4 — Product Walkthrough
 
-### Frontend (Flutter / Dart)
-| Package | Purpose |
-|---------|---------|
-| `flutter` (SDK 3.47+, Dart 3.13) | UI framework |
-| `http` | REST calls to our backend |
-| `provider` | State management (FavoritesProvider) |
-| `shared_preferences` | Persist wishlist locally |
-| `flutter_svg` | Render `logo.svg` everywhere |
-| `intl` | Date/number formatting |
+### The main user journey
 
-### Backend (Node.js)
-| Package | Purpose |
-|---------|---------|
-| `express` | REST API server |
-| `axios` | HTTP client to Open Library |
-| `cors` | Cross-origin access |
-| `dotenv` | Environment configuration |
-
-### External API
-- **Open Library** (`openlibrary.org`) — search, trending, subjects, works, editions, ratings, covers.
-
----
-
-## Slide 5 — System Architecture
-
-```
-                 ┌──────────────────────────────┐
-                 │        FLUTTER APP           │
-                 │  Splash → Home → Details     │
-                 │  (provider + shared_prefs)   │
-                 └──────────────┬───────────────┘
-                                │  HTTP (JSON)
-                                │  http://localhost:3000/api
-                                ▼
-                 ┌──────────────────────────────┐
-                 │   NODE.JS / EXPRESS BACKEND  │
-                 │  routes/books.js             │
-                 │  services/bookService.js     │
-                 │  utils/normalize.js          │
-                 └──────────────┬───────────────┘
-                                │  axios
-                                ▼
-                 ┌──────────────────────────────┐
-                 │      OPEN LIBRARY API        │
-                 │  search.json / trending /    │
-                 │  subjects / works / covers   │
-                 └──────────────────────────────┘
+```text
+Launch
+  ↓
+Animated splash
+  ↓
+Home dashboard
+  ├─ Search books ───────────────→ Search results → Book details
+  ├─ Browse a category ──────────→ Category results → Book details
+  ├─ Open a recommendation ──────→ Book details
+  └─ Tap the heart ──────────────→ Wishlist / Favorites
 ```
 
-### Data flow
-1. UI triggers `ApiService` → backend endpoint.
-2. Backend calls Open Library, normalizes the response (`normalize.js`).
-3. Clean JSON returns to the app → UI rebuilds via `Provider`.
-4. Wishlist writes go to `SharedPreferences` (offline-first).
+### Screens delivered
+
+| Screen | Purpose |
+|---|---|
+| `SplashScreen` | Branded opening animation |
+| `HomeScreen` | Search, categories, distribution, recommendations, wishlist |
+| `CategoryScreen` | Paginated books for one subject |
+| `BookDetailsScreen` | Cover, description, ratings, subjects, editions |
+| `FavoritesScreen` | Locally persisted wishlist |
+
+> **Demo cue:** Follow this exact path during the live demo: search → details → heart → favorites.
 
 ---
 
-## Slide 6 — API Details
+## Slide 5 — Technology Stack
 
-### Our Backend Endpoints (`/api`)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Service health check |
-| GET | `/api/books/search?q=&page=&limit=` | Search books (paginated) |
-| GET | `/api/books/trending?limit=` | Trending books |
-| GET | `/api/books/subject/:subject?page=&limit=` | Books by category |
-| GET | `/api/books/:workId` | Full book details |
-| GET | `/api/books/categories` | **16 categories + counts + % distribution** |
-| GET | `/api/books/recommendations?limit=` | **Recommended books (trending + popular)** |
-| GET | `/logo.svg` | Serves the app logo |
+### Frontend
 
-### Open Library endpoints consumed
-- `GET /search.json` — full-text search
-- `GET /trending/daily.json` — daily trending works
-- `GET /subjects/{subject}.json` — category books + `work_count`
-- `GET /works/{id}.json`, `/editions.json`, `/ratings.json` — details
-- `https://covers.openlibrary.org/b/id/{coverId}-{S|M|L}.jpg` — cover images
+| Technology | Role |
+|---|---|
+| Flutter / Dart | Cross-platform UI |
+| `http` | Calls the REST API |
+| `provider` | Reactive wishlist state |
+| `shared_preferences` | Local wishlist persistence |
+| `flutter_svg` | Reusable `logo.svg` rendering |
+| `intl` | Formatting values for display |
 
-### Sample response (categories)
-```json
-{ "categories": [
-    { "name": "History", "subject": "history", "emoji": "🏛️",
-      "bookCount": 2559352, "percentage": 72.5 },
-    { "name": "Biography", "subject": "biography", "emoji": "👤",
-      "bookCount": 916244, "percentage": 26.0 }
-  ], "total": 16 }
+### Backend
+
+| Technology | Role |
+|---|---|
+| Node.js 18+ | Server runtime |
+| Express | REST API and routing |
+| Axios | Open Library HTTP client |
+| CORS | Frontend/backend communication |
+| dotenv | Environment configuration |
+
+### Data source
+
+**Open Library API** provides search, trending works, subjects, editions, ratings, and cover images.
+
+---
+
+## Slide 6 — System Architecture
+
+```text
+┌───────────────────────────────────────────────────────────┐
+│ Flutter mobile app                                       │
+│ Screens → Widgets → ApiService → FavoritesProvider      │
+│                 │                 │                      │
+│                 │                 └─ SharedPreferences   │
+└─────────────────┼─────────────────────────────────────────┘
+                  │ HTTP / JSON
+                  ▼
+┌───────────────────────────────────────────────────────────┐
+│ Node.js / Express backend                                │
+│ routes/books.js → bookService.js → normalize.js          │
+└─────────────────┼─────────────────────────────────────────┘
+                  │ Axios
+                  ▼
+┌───────────────────────────────────────────────────────────┐
+│ Open Library API                                         │
+│ Search · Trending · Subjects · Works · Editions · Ratings│
+└───────────────────────────────────────────────────────────┘
 ```
 
----
+### Why use a backend?
 
-## Slide 7 — Application Flow
-
-### App launch flow
-1. **Splash screen** — `logo.svg` scales/rotates in with an elastic curve, glow fades up, app name + tagline slide in, pulsing dots, then a fade transition into the main app.
-2. **Home screen** loads → `Future.wait` fetches **categories** + **recommendations** in parallel.
-3. User sees: welcome banner → category distribution → recommendations → wishlist.
-
-### User journeys
-- **Search:** type query → `onSubmitted` → `/search` → paginated `ListView` (infinite scroll via `ScrollController`).
-- **Browse category:** tap a category card → `CategoryScreen` → `/subject/:subject` → book list.
-- **Wishlist:** tap heart → `FavoritesProvider.toggleFavorite()` → saved to `SharedPreferences` → shown in "Your Wishlist" + "Favorites" tab.
-- **Details:** tap a book → `BookDetailsScreen` → `/books/:workId` → description, rating bar, subjects, editions.
-
-### State management
-- `ChangeNotifierProvider` exposes `FavoritesProvider` (load/save/toggle/remove/clear).
-- `context.watch` rebuilds UI when favorites change.
+- Keeps third-party API integration in one place
+- Validates and bounds request parameters
+- Converts inconsistent upstream data into a stable app model
+- Gives the frontend a clean, project-owned API
 
 ---
 
-## Slide 8 — Key Features & Screens
+## Slide 7 — API Design
 
-### Screens
-1. **SplashScreen** — animated logo opening sequence.
-2. **HomeScreen** — search bar + dashboard sections.
-3. **CategoryScreen** — all books inside one category (paginated).
-4. **BookDetailsScreen** — cover, rating, description, subjects, editions.
-5. **FavoritesScreen** — the saved wishlist with clear-all.
+### Project API (`/api`)
 
-### Home screen sections (the dashboard)
-- **Welcome banner** — gradient card with logo + tagline.
-- **Browse by Category** — horizontal category cards (emoji, name, book count).
-- **Category Distribution chart** — horizontal progress bars with % share per category.
-- **Recommended for You** — horizontal cover cards with a "reason" chip (e.g., *Trending now*, *Popular in Fiction*).
-- **Your Wishlist** — horizontal covers with a heart badge to remove.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/health` | Check server availability |
+| `GET` | `/books/search?q=&page=&limit=` | Paginated search |
+| `GET` | `/books/trending?limit=` | Trending titles |
+| `GET` | `/books/subject/:subject` | Category browsing |
+| `GET` | `/books/:workId` | Full work details |
+| `GET` | `/books/categories` | Counts and percentages |
+| `GET` | `/books/recommendations` | Curated mixed feed |
 
-### Reusable components
-`AppLogo` (SVG logo), `BookCard`, `CategoryDistribution`, `RecommendedBooksSection`, `WishlistSection`, `LoadingState`, `ErrorState`, `EmptyState`.
+### Example: request validation
 
----
+```js
+const { q, page = 1, limit = 20 } = req.query;
 
-## Slide 9 — Implementation Highlights
+if (!q || !q.trim()) {
+  return res.status(400).json({
+    error: 'Validation error',
+    message: 'Query parameter "q" is required and cannot be empty'
+  });
+}
 
-### Logo everywhere (`logo.svg`)
-- Single source of truth: `assets/images/logo.svg` (also served by backend at `/logo.svg`).
-- Rendered with `flutter_svg` in: splash, home app bar, home banner, favorites app bar, book details app bar, and web favicon (`web/index.html` + `web/manifest.json`).
+const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 20));
+```
 
-### Opening animation
-- `AnimationController` + `CurvedAnimation` (elasticOut, easeOutCubic).
-- Logo: scale 0→1 + rotate −0.35→0 rad + glow opacity.
-- Text: slide-up + fade; ambient radial glow; pulsing loading dots.
-- Exit: fade-out → `PageRouteBuilder` fade into `MainNavigation`.
-
-### Category-wise distribution (ready on home)
-- Backend aggregates `work_count` for 16 subjects in parallel (`Promise.allSettled`), computes each category's `%` share, sorts by count.
-- Frontend renders both **category cards** and a **distribution bar chart**.
-
-### Recommendations
-- Backend merges **trending daily** + **popular fiction** + **popular science**, de-duplicates by work key, and tags each book with a `reason`.
-
-### Wishlist
-- `FavoritesProvider` + `SharedPreferences` → persists across app restarts; heart toggle anywhere updates all screens instantly.
+**Result:** predictable requests, bounded page sizes, and clearer client errors.
 
 ---
 
-## Slide 10 — Conclusion & Future Scope
+## Slide 8 — Data Normalization
 
-### Conclusion
-- Delivered a complete, animated, category-driven book discovery app.
-- Clean separation: Flutter UI ↔ Express backend ↔ Open Library data.
-- Home screen is a ready dashboard: **categories distribution + recommendations + wishlist**, all using the branded `logo.svg` and a polished opening animation.
+### The app should not depend on raw upstream response shapes
 
-### Future scope
-- User accounts & cloud-synced wishlist (Firebase / Supabase).
-- Personalized recommendations using reading history (ML).
-- Book previews / read-online via Open Library read API.
-- Dark mode, multi-language (i18n), and social sharing.
-- Caching layer (Redis) + pagination cursors for scale.
+Open Library responses can contain missing fields, different author formats, and multiple description formats. The backend maps them into one `Book` shape:
 
-### How to run
+```js
+const results = docs.map(doc => ({
+  id: doc.key,
+  title: doc.title || 'Unknown Title',
+  authors: doc.author_name || [],
+  first_publish_year: doc.first_publish_year || null,
+  cover_id: doc.cover_i || null,
+  edition_count: doc.edition_count || null,
+  subjects: doc.subject ? doc.subject.slice(0, 10) : [],
+  ratings_average: doc.ratings_average || null
+}));
+```
+
+### Benefits
+
+- UI widgets receive consistent fields
+- Null or missing values do not break a screen
+- Formatting decisions stay out of the presentation layer
+- Search, category, and recommendation cards can reuse the same model
+
+---
+
+## Slide 9 — Home Dashboard Performance
+
+### Independent requests load in parallel
+
+```dart
+final results = await Future.wait([
+  _apiService.getCategories(),
+  _apiService.getRecommendations(limit: 12),
+]);
+
+if (!mounted) return;
+setState(() {
+  _categories = results[0] as List<BookCategory>;
+  _recommendations = results[1] as List<Book>;
+  _isLoadingHome = false;
+});
+```
+
+### What this achieves
+
+- Categories and recommendations do not wait for each other
+- One loading state controls the dashboard
+- `mounted` prevents updating a disposed screen
+- Retry/error state is shown when the home request fails
+
+**Design principle:** fetch independent data concurrently, then render one coherent experience.
+
+---
+
+## Slide 10 — Recommendations & Category Intelligence
+
+### Recommendations combine multiple signals
+
+The backend requests:
+
+- Daily trending books
+- Popular fiction
+- Popular science
+
+Then it de-duplicates results and adds a reason label:
+
+```js
+const seen = new Set();
+const recommendations = [];
+
+const pushBook = (doc, reason) => {
+  if (!doc.key || seen.has(doc.key)) return;
+  seen.add(doc.key);
+  recommendations.push({
+    id: doc.key,
+    title: doc.title || 'Unknown Title',
+    reason
+  });
+};
+```
+
+### Category distribution
+
+- 16 predefined subjects are queried in parallel.
+- Each subject contributes a `work_count`.
+- Counts are converted into a percentage of the total.
+- Categories are sorted from largest to smallest.
+
+This gives the home screen both **discovery content** and **catalogue insight**.
+
+---
+
+## Slide 11 — Wishlist State & Offline Persistence
+
+### One provider keeps the UI synchronized
+
+```dart
+Future<void> toggleFavorite(Book book) async {
+  final index = _favorites.indexWhere((b) => b.id == book.id);
+
+  if (index >= 0) {
+    _favorites.removeAt(index);
+  } else {
+    _favorites.insert(0, book);
+  }
+
+  await _saveFavorites();
+  notifyListeners();
+}
+```
+
+### User benefit
+
+- Heart actions work from cards and details
+- Home and Favorites update immediately
+- Saved books survive app restarts
+- No login is required for the core wishlist experience
+
+**State flow:** `BookCard` → `FavoritesProvider` → `SharedPreferences` → all listening screens.
+
+---
+
+## Slide 12 — UI & UX Highlights
+
+### Product polish
+
+- Reusable `AppLogo` renders the same SVG across the app
+- Elastic scale, rotation, glow, and fade animations on launch
+- Horizontal cards make recommendations easy to scan
+- Progress bars communicate category share visually
+- Loading, error, and empty states make network behaviour understandable
+- Responsive layouts support mobile and web targets
+
+### Reusable building blocks
+
+`AppLogo` · `BookCard` · `CategoryDistribution` · `RecommendedBooksSection` · `WishlistSection` · `LoadingState` · `ErrorState` · `EmptyState`
+
+> **Visual suggestion:** Place screenshots of the splash, home dashboard, details, and favorites screen in a 2×2 grid on this slide.
+
+---
+
+## Slide 13 — Development Decisions & Challenges
+
+### Challenge → decision → result
+
+| Challenge | Engineering decision | Result |
+|---|---|---|
+| Raw API data is inconsistent | Normalize responses in the backend | Stable frontend model |
+| Large categories can be slow | Use longer subject timeout and clean `502` errors | Better failure feedback |
+| Home needs multiple data sources | Use `Future.wait` | Faster initial dashboard |
+| Recommendations may overlap | De-duplicate using a `Set` | Cleaner feed |
+| Wishlist should work without accounts | Store serialized books locally | Useful offline-friendly feature |
+
+### Development approach
+
+1. Build the API contract.
+2. Create reusable Flutter models and widgets.
+3. Connect screens through `ApiService`.
+4. Add state persistence and error states.
+5. Polish animations and the branded visual system.
+
+---
+
+## Slide 14 — Demonstration Plan
+
+### A 90-second live demo
+
+1. Launch the app and show the animated logo.
+2. Point out categories, distribution, and recommendations on Home.
+3. Search for a book such as **“The Hobbit”**.
+4. Open the details page and show cover, authors, rating, and subjects.
+5. Tap the heart icon.
+6. Open Favorites and show the saved book.
+7. Restart or refresh the app to demonstrate persistence.
+
+### Backup plan
+
+If the external API is slow, show the architecture slide and explain that the backend returns a controlled error instead of exposing a raw stack trace.
+
+---
+
+## Slide 15 — Running the Project
+
+### Backend
+
 ```bash
-# Backend
 cd bookfinder/backend
 npm install
-npm start            # http://localhost:3000
+npm start
+# API: http://localhost:3000
+```
 
-# Frontend
+### Frontend
+
+```bash
 cd bookfinder/frontend
 flutter pub get
-flutter run          # connects to http://localhost:3000/api
+flutter run
+```
+
+### Repository structure
+
+```text
+bookfinder/
+├── backend/
+│   └── src/
+│       ├── routes/
+│       ├── services/
+│       └── utils/normalize.js
+└── frontend/
+    ├── lib/screens/
+    ├── lib/widgets/
+    ├── lib/models/
+    └── lib/services/api_service.dart
 ```
 
 ---
 
-*Prepared by Group 52–55: Abhishek Vishwakarma · Pranav Vishwakarma · Sanchita Warkad · Ankesh Yadav*
+## Slide 16 — Conclusion & Future Scope
+
+### What we delivered
+
+- A polished cross-platform book discovery app
+- A clean Flutter → Express → Open Library architecture
+- Search, categories, recommendations, details, and wishlist
+- Reusable components, validation, normalization, and persistence
+- A branded experience from splash screen to saved collection
+
+### What comes next
+
+- Account-based cloud wishlist synchronization
+- Personalized recommendations from reading history
+- Redis caching and cursor-based pagination
+- Dark mode, localization, and social sharing
+- Book previews and read-online integrations where available
+
+## Thank you
+
+### Questions?
+
+**BookFinder — Discover your next favourite book.**
+
