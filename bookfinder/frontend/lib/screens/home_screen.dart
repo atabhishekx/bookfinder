@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/book.dart';
 import '../models/favorites_provider.dart';
 import '../services/api_service.dart';
+import '../screens/recommendations_screen.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/book_card.dart';
 import '../widgets/category_distribution.dart';
@@ -264,7 +265,12 @@ class _HomeScreenState extends State<HomeScreen> {
             RecommendedBooksSection(
               books: _recommendations,
               isLoading: false,
-              onSeeAll: () {},
+              onSeeAll: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const RecommendationsScreen(),
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             const WishlistSection(),
